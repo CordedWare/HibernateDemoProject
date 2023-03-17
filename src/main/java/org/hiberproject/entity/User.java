@@ -20,14 +20,20 @@ import javax.persistence.*;
 @TypeDef(name = "hiberproject", typeClass = JsonBinaryType.class)
 public class User {
 
-    @Id // PK
-    private String username;
-    private String firstname;
-    private String lastname;
+    @Id
+    @GeneratedValue(generator = "user_gen", strategy = GenerationType.IDENTITY)
+//    @SequenceGenerator(name = "user_gen", sequenceName = "users_id_seq", allocationSize = 1)
+    @TableGenerator(name = "user_gen", table = "all_sequence",
+            pkColumnName = "table_name", valueColumnName = "pk_value",
+            allocationSize = 1)
+    private Long id;
 
-//    @Convert(converter = BirthdayConverter.class)
-    @Column(name = "birth_date")                                                // добавляем, чтобы название нашей переменной совпадало с названием поля в БД, но т.к. мы определили setPhysicalNamingStrategy(), то это делать необязательно
-    private Birthday birthDate;
+    @Column(unique = true)
+    private String username;
+
+    @Embedded
+    @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
+    private PersonalInfo personalInfo;
 
     @Type(type = "hiberproject")                                                      // для Json формата конвертер
     private String info;
