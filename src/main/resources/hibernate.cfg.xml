@@ -13,5 +13,6 @@
         <property name="format_sql">true</property> <!-- чтобы он нам и форматировал красиво -->
 
         <mapping class="org.hiberproject.entity.User"/>
+        <mapping class="org.hiberproject.entity.Company"/>
     </session-factory>
 </hibernate-configuration>
