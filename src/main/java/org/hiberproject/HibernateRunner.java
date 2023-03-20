@@ -1,6 +1,7 @@
 package org.hiberproject;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.hiberproject.entity.Birthday;
 import org.hiberproject.entity.Company;
 import org.hiberproject.entity.PersonalInfo;
@@ -18,10 +19,10 @@ public class HibernateRunner {
 
     public static void main(String[] args) throws SQLException {
         Company company = Company.builder()
-                .name("Google")
+                .name("Amazon")
                 .build();
-        User user = User.builder()                                                 // Transient состояние
-                .username("petr11@gmail.com")
+        User user = User.builder() // Transient состояние
+                .username("ivan@gmail.com")
                 .personalInfo(PersonalInfo.builder()
                         .lastname("Petrov")
                         .firstname("Petr")
@@ -35,7 +36,6 @@ public class HibernateRunner {
             try (session1) {
                 Transaction transaction = session1.beginTransaction();
 
-                session1.save(company);
                 session1.save(user);
 
                 session1.getTransaction().commit();

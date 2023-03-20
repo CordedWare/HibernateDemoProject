@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class PersonalInfo implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -3156312877865357000L;
+    private static final long serialVersionUID = 1L;
     private String firstname;
     private String lastname;
 

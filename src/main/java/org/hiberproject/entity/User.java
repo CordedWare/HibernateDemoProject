@@ -1,10 +1,7 @@
 package org.hiberproject.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hiberproject.entity.Birthday;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
@@ -14,6 +11,7 @@ import javax.persistence.*;
 @Data                                                                           // Это POJO сущность (геттеры, сеттеры, хеш-код, эквалс, ту-стринг, конструкторы и т.д.)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "company")
 @Builder                                                                        // для SessionFactory чтобы при вызове сессии добавлять в этот класс нужные данные для записи в БД
 @Entity                                                                         // каждая сущность в hibernate должна иметь PK
 @Table(name = "users", schema = "public")                                       // чтобы название таблицы совпадала с названием сущности (DB 'user' = .class 'user'), а не названием класса User
@@ -30,13 +28,13 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    @Type(type = "hiberproject")                                                      // для Json формата конвертер
+    @Type(type = "hiberproject")                                               // для Json формата конвертер
     private String info;
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     @JoinColumn(name = "company_id") // company_id
     private Company company;
 }
