@@ -1,6 +1,9 @@
 package org.hiberproject;
 
+import lombok.Cleanup;
+import org.hiberproject.entity.Company;
 import org.hiberproject.entity.User;
+import org.hiberproject.util.HibernateUtil;
 import org.junit.jupiter.api.Test;
 
 import javax.persistence.Column;
@@ -13,16 +16,31 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.joining;
 
 // 6. Класс Session
 
 class HibernateRunnerTest {
 
     @Test
-    void checkGetReflectionApi() throws SQLException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    void oneToMany() {
+        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        var company = session.get(Company.class, 2);
+        System.out.println(company.getUsers());
+
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void checkGetReflectionApi() throws SQLException, NoSuchMethodException,
+            InvocationTargetException, InstantiationException,
+            IllegalAccessException, NoSuchFieldException {
+
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = preparedStatement.executeQuery();
         resultSet.getString("username");
@@ -37,6 +55,7 @@ class HibernateRunnerTest {
         usernameField.setAccessible(true);
         usernameField.set(user, resultSet.getString("username"));
     }
+
     @Test
     void checkReflectionApi() throws SQLException, IllegalAccessException {
         User user = User.builder()
@@ -50,11 +69,9 @@ class HibernateRunnerTest {
                 values
                 (%s)
                 """;
-
         String tableName = ofNullable(user.getClass().getAnnotation(Table.class))
-                .map(tableAnnotation -> tableAnnotation.schema() + "." + tableAnnotation.schema())
+                .map(tableAnnotation -> tableAnnotation.schema() + "." + tableAnnotation.name())
                 .orElse(user.getClass().getName());
-
 
         Field[] declaredFields = user.getClass().getDeclaredFields();
 
@@ -62,15 +79,13 @@ class HibernateRunnerTest {
                 .map(field -> ofNullable(field.getAnnotation(Column.class))
                         .map(Column::name)
                         .orElse(field.getName()))
-                .collect(Collectors.joining(", "));
-
+                .collect(joining(", "));
 
         String columnValues = Arrays.stream(declaredFields)
                 .map(field -> "?")
-                .collect(Collectors.joining(", "));
+                .collect(joining(", "));
 
         System.out.println(sql.formatted(tableName, columnNames, columnValues));
-
 
         Connection connection = null;
         PreparedStatement preparedStatement = connection.prepareStatement(sql.formatted(tableName, columnNames, columnValues));
