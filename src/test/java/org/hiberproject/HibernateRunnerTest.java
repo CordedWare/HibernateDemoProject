@@ -1,6 +1,7 @@
 package org.hiberproject;
 
 import lombok.Cleanup;
+import org.hibernate.Hibernate;
 import org.hiberproject.entity.Company;
 import org.hiberproject.entity.User;
 import org.hiberproject.util.HibernateUtil;
@@ -23,6 +24,47 @@ import static java.util.stream.Collectors.joining;
 // 6. Класс Session
 
 class HibernateRunnerTest {
+
+    @Test
+    void checkOrhanRemoval(){
+        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            Company company = session.getReference(Company.class, 10);
+            company.getUsers().removeIf(user -> user.getId().equals(8L));
+
+            session.getTransaction().commit();
+        }
+    }
+
+    @Test
+    void checkLazyInitialisation() {
+        Company company = null;
+        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            company = session.getReference(Company.class, 2);
+
+            session.getTransaction().commit();
+        }
+        var users = company.getUsers();
+        System.out.println(users.size());
+    }
+
+    @Test
+    void getCompanyById() {
+        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        var company = session.get(Company.class, 2);
+        Hibernate.initialize(company.getUsers());
+        System.out.println();
+
+        session.getTransaction().commit();
+    }
 
     @Test
     void deleteCompany() {
@@ -75,6 +117,7 @@ class HibernateRunnerTest {
         session.beginTransaction();
 
         var company = session.get(Company.class, 2);
+        Hibernate.initialize(company.getUsers());
         System.out.println(company.getUsers());
 
         session.getTransaction().commit();
