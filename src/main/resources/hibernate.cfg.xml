@@ -14,5 +14,6 @@
 
         <mapping class="org.hiberproject.entity.User"/>
         <mapping class="org.hiberproject.entity.Company"/>
+        <mapping class="org.hiberproject.entity.Profile"/>
     </session-factory>
 </hibernate-configuration>

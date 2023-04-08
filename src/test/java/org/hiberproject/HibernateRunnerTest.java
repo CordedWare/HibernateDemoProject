@@ -3,6 +3,7 @@ package org.hiberproject;
 import lombok.Cleanup;
 import org.hibernate.Hibernate;
 import org.hiberproject.entity.Company;
+import org.hiberproject.entity.Profile;
 import org.hiberproject.entity.User;
 import org.hiberproject.util.HibernateUtil;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,31 @@ import static java.util.stream.Collectors.joining;
 // 6. Класс Session
 
 class HibernateRunnerTest {
+
+    @Test
+    void checkOneToOne() {
+        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            var user = User.builder()
+                    .username("test3@gmail.com")
+                    .build();
+
+            var profile = Profile.builder()
+                    .language("ru")
+                    .street("Kolasa 18")
+                    .build();
+
+            profile.setUser(user);
+
+            session.save(user);
+//            profile.setUser(user);
+//            session.save(profile);
+
+            session.getTransaction().commit();
+        }
+    }
 
     @Test
     void checkOrhanRemoval(){
