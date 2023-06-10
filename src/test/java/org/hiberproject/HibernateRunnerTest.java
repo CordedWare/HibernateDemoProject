@@ -2,9 +2,7 @@ package org.hiberproject;
 
 import lombok.Cleanup;
 import org.hibernate.Hibernate;
-import org.hiberproject.entity.Company;
-import org.hiberproject.entity.Profile;
-import org.hiberproject.entity.User;
+import org.hiberproject.entity.*;
 import org.hiberproject.util.HibernateUtil;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Arrays;
 
 import static java.util.Optional.ofNullable;
@@ -25,6 +24,37 @@ import static java.util.stream.Collectors.joining;
 // 6. Класс Session
 
 class HibernateRunnerTest {
+
+    @Test
+    void checkManyToMany() {
+        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            var user = session.get(User.class, 1L);
+            var chat = session.get(Chat.class, 1L);
+
+            var userChat = UserChat.builder()
+                    .createdAt(Instant.now())
+                    .createdBy(user.getUsername())
+                    .build();
+            userChat.setUser(user);
+            userChat.setChat(chat);
+
+            session.save(userChat);
+
+//            user.getChats().clear();
+
+//            var chat = Chat.builder()
+//                    .name("hiberproject")
+//                    .build();
+//            user.addChat(chat);
+//
+//            session.save(chat);
+
+            session.getTransaction().commit();
+        }
+    }
 
     @Test
     void checkOneToOne() {

@@ -6,12 +6,14 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data                                                                           // Это POJO сущность (геттеры, сеттеры, хеш-код, эквалс, ту-стринг, конструкторы и т.д.)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "username")
-@ToString(exclude = {"company", "profile"})
+@ToString(exclude = {"company", "profile", "userChats"})
 @Builder                                                                        // для SessionFactory чтобы при вызове сессии добавлять в этот класс нужные данные для записи в БД
 @Entity                                                                         // каждая сущность в hibernate должна иметь PK
 @Table(name = "users", schema = "public")                                       // чтобы название таблицы совпадала с названием сущности (DB 'user' = .class 'user'), а не названием класса User
@@ -45,4 +47,8 @@ public class User {
             optional = false
     )
     private Profile profile;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user")
+    private Set<UserChat> userChats = new HashSet<>();
 }

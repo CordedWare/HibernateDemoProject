@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/HibernateDemoProject.main.iml" filepath="$PROJECT_DIR$/.idea/modules/HibernateDemoProject.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/HibernateDemoProject.test.iml" filepath="$PROJECT_DIR$/.idea/modules/HibernateDemoProject.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.hiberproject.HibernateDemoProject.main.iml" filepath="$PROJECT_DIR$/.idea/modules/org.hiberproject.HibernateDemoProject.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/org.hiberproject.HibernateDemoProject.test.iml" filepath="$PROJECT_DIR$/.idea/modules/org.hiberproject.HibernateDemoProject.test.iml" />
     </modules>
   </component>
 </project>
