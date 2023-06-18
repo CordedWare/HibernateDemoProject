@@ -19,7 +19,7 @@ import java.util.Set;
 @Builder                                                                        // для SessionFactory чтобы при вызове сессии добавлять в этот класс нужные данные для записи в БД
 @Entity                                                                         // каждая сущность в hibernate должна иметь PK
 @Table(name = "users", schema = "public")                                       // чтобы название таблицы совпадала с названием сущности (DB 'user' = .class 'user'), а не названием класса User
-@TypeDef(name = "hiberproject", typeClass = JsonBinaryType.class)
+//@TypeDef(name = "hiberproject", typeClass = JsonBinaryType.class)
 public class User implements Comparable<User> {
 
     @Id
@@ -29,11 +29,11 @@ public class User implements Comparable<User> {
     @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
     private PersonalInfo personalInfo;
 
-    @Column(unique = true)
+    @Column(unique = true, columnDefinition = "")
     private String username;
 
-    @Type(type = "hiberproject")                                               // для Json формата конвертер
-    private String info;
+//    @Type(type = "hiberproject")                                               // для Json формата конвертер
+//    private String info;
 
     @Enumerated(EnumType.STRING)
     private Role role;
