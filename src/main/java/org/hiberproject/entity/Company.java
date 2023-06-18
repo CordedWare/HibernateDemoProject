@@ -31,21 +31,23 @@ public class Company {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
 //    @OrderBy("username DESC, personalInfo.lastname ASC")
 //    @OrderBy("personalInfo.firstname")
-    @OrderColumn(name = "lastname")
+//    @OrderColumn(name = "id")
     @SortNatural
-    private SortedSet<User> users = new TreeSet<>();
+    @MapKey(name = "username")
+    private Map<String, User> users = new TreeMap<>();
 
     @Builder.Default
     @ElementCollection
     @CollectionTable(name = "company_locale", joinColumns = @JoinColumn(name = "company_id"))
 //    @AttributeOverride(name = "lang", column =  @Column(name = "language"))
 //    private List<LocaleInfo> locales = new ArrayList<>();
-    @Column(name = "description")
-    private List<String> locales = new ArrayList<>();
+//    @Column(name = "description")
+    @MapKeyColumn(name = "lang")
+    private Map<String, String> locales = new HashMap();
 
 
     public void addUser(User user) {
-        users.add(user);
+        users.put(user.getUsername(), user);
         user.setCompany(this);
     }
 }
