@@ -6,10 +6,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.SortNatural;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -29,7 +29,20 @@ public class Company {
 
     @Builder.Default
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<User> users = new HashSet<>();
+//    @OrderBy("username DESC, personalInfo.lastname ASC")
+//    @OrderBy("personalInfo.firstname")
+    @OrderColumn(name = "lastname")
+    @SortNatural
+    private SortedSet<User> users = new TreeSet<>();
+
+    @Builder.Default
+    @ElementCollection
+    @CollectionTable(name = "company_locale", joinColumns = @JoinColumn(name = "company_id"))
+//    @AttributeOverride(name = "lang", column =  @Column(name = "language"))
+//    private List<LocaleInfo> locales = new ArrayList<>();
+    @Column(name = "description")
+    private List<String> locales = new ArrayList<>();
+
 
     public void addUser(User user) {
         users.add(user);

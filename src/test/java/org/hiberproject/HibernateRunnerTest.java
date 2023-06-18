@@ -26,6 +26,22 @@ import static java.util.stream.Collectors.joining;
 class HibernateRunnerTest {
 
     @Test
+    void localeInfo() {
+        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+            var company = session.get(Company.class, 2);
+//            company.getLocales().add(LocaleInfo.of("ru", "Описание на русском"));
+//            company.getLocales().add(LocaleInfo.of("en", "English description"));
+//            System.out.println(company.getLocales());
+            company.getUsers().forEach(System.out::println);
+
+            session.getTransaction().commit();
+        }
+    }
+
+    @Test
     void checkManyToMany() {
         try (var sessionFactory = HibernateUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
@@ -157,7 +173,7 @@ class HibernateRunnerTest {
                 .build();
 
         var user = User.builder()
-                .username("Sveta@gmail.com")
+                .username("SvetaNew@gmail.com")
                 .build();
         company.addUser(user);
 
