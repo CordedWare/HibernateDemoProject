@@ -17,5 +17,7 @@
         <mapping class="org.hiberproject.entity.Profile"/>
         <mapping class="org.hiberproject.entity.Chat"/>
         <mapping class="org.hiberproject.entity.UserChat"/>
+        <mapping class="org.hiberproject.entity.Programmer"/>
+        <mapping class="org.hiberproject.entity.Manager"/>
     </session-factory>
 </hibernate-configuration>
