@@ -1,29 +1,38 @@
 package org.hiberproject.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
-
+import org.hibernate.annotations.TypeDef;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hiberproject.util.StringUtils.SPACE;
+
+@NamedQuery(name = "findUserByName", query = "select u from User u " +
+        "left join u.company c " +
+        "where u.personalInfo.firstname = :firstname and c.name = :companyName " +
+        "order by u.personalInfo.lastname desc")
 @Data                                                                           // Это POJO сущность (геттеры, сеттеры, хеш-код, эквалс, ту-стринг, конструкторы и т.д.)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = "username")
-@ToString(exclude = {"company", "profile", "userChats"})
+@EqualsAndHashCode(of = "username") // callSuper=false добавил сам, т.к. не работало
+@ToString(exclude = {"company", "profile", "userChats", "payments"})
+@Builder
 @Entity                                                                         // каждая сущность в hibernate должна иметь PK
 @Table(name = "users", schema = "public")                                       // чтобы название таблицы совпадала с названием сущности (DB 'user' = .class 'user'), а не названием класса User
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class User implements Comparable<User>, BaseEntity<Long> {
+@TypeDef(name = "hiberproject", typeClass = JsonBinaryType.class)
+@Inheritance(strategy = InheritanceType.JOINED)
+public class User implements Comparable<User>, BaseEntity<Long> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @AttributeOverride(name = "birthDate", column = @Column(name = "birth_date"))
     private PersonalInfo personalInfo;
 
-    @Column(unique = true, columnDefinition = "")
+    @Column(unique = true) // , columnDefinition = ""
     private String username;
 
     @Enumerated(EnumType.STRING)
@@ -40,12 +49,20 @@ public abstract class User implements Comparable<User>, BaseEntity<Long> {
     )
     private Profile profile;
 
-//    @Builder.Default
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<UserChat> userChats = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "receiver")
+    private List<Payment> payments = new ArrayList<>();
 
     @Override
     public int compareTo(User user) {
         return username.compareTo(user.username);
+    }
+
+    public String fullName() {
+        return getPersonalInfo().getFirstname() + SPACE + getPersonalInfo().getLastname();
     }
 }

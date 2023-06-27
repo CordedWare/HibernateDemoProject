@@ -1,9 +1,11 @@
 package org.hiberproject;
 
 import lombok.Cleanup;
+import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.QueryHints;
 import org.hiberproject.entity.*;
-import org.hiberproject.util.HibernateUtil;
+import org.hiberproject.util.HibernateTestUtil;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
@@ -18,8 +20,36 @@ import java.sql.SQLException;
 class HibernateRunnerTest {
 
     @Test
+    void checkHql() {
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
+             var session = sessionFactory.openSession()) {
+            session.beginTransaction();
+
+//            HQL / JPQL
+//            select u.* from users u where u.firstname = 'Ivan'
+            String name = "Ivan";
+            var result = session.createNamedQuery(
+//                    "select u from User u where u.personalInfo.firstname = ?1", User.class)
+                            "findUserByName", User.class)
+//                    .setParameter(1, name)
+                    .setParameter("firstname", name)
+                    .setParameter("companyName", "Google")
+                    .setFlushMode(FlushMode.COMMIT)
+                    .setHint(QueryHints.FETCH_SIZE, "50")
+                    .list();
+
+            var countRows = session.createQuery("update User u set u.role = 'ADMIN'")
+                            .executeUpdate();
+
+            session.createNativeQuery("select u.* from users u where u.firstname = 'Ivan'", User.class);
+
+            session.getTransaction().commit();
+        }
+    }
+
+    @Test
     void checkH2() {
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -28,24 +58,24 @@ class HibernateRunnerTest {
                     .build();
             session.save(google);
 
-            Programmer programmer = Programmer.builder()
-                    .username("ivan_tret@gmail.com")
-                    .language(Language.Java)
-                    .company(google)
-                    .build();
-            session.save(programmer);
-
-            Manager manager = Manager.builder()
-                    .username("daria_tret@gmail.com")
-                    .projectName("Starter")
-                    .company(google)
-                    .build();
-            session.save(manager);
+//            Programmer programmer = Programmer.builder()
+//                    .username("ivan_tret@gmail.com")
+//                    .language(Language.Java)
+//                    .company(google)
+//                    .build();
+//            session.save(programmer);
+//
+//            Manager manager = Manager.builder()
+//                    .username("daria_tret@gmail.com")
+//                    .projectName("Starter")
+//                    .company(google)
+//                    .build();
+//            session.save(manager);
             session.flush();
 
             session.clear();
 
-            var programmer1 = session.get(Programmer.class, 1L);
+//            var programmer1 = session.get(Programmer.class, 1L);
             var manager1 = session.get(User.class, 1L);
             System.out.println();
 
@@ -55,7 +85,7 @@ class HibernateRunnerTest {
 
     @Test
     void localeInfo() {
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -72,7 +102,7 @@ class HibernateRunnerTest {
 
     @Test
     void checkManyToMany() {
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -103,7 +133,7 @@ class HibernateRunnerTest {
 
     @Test
     void checkOneToOne() {
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -128,7 +158,7 @@ class HibernateRunnerTest {
 
     @Test
     void checkOrhanRemoval(){
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -142,7 +172,7 @@ class HibernateRunnerTest {
     @Test
     void checkLazyInitialisation() {
         Company company = null;
-        try (var sessionFactory = HibernateUtil.buildSessionFactory();
+        try (var sessionFactory = HibernateTestUtil.buildSessionFactory();
              var session = sessionFactory.openSession()) {
             session.beginTransaction();
 
@@ -156,7 +186,7 @@ class HibernateRunnerTest {
 
     @Test
     void getCompanyById() {
-        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var sessionFactory = HibernateTestUtil.buildSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -169,7 +199,7 @@ class HibernateRunnerTest {
 
     @Test
     void deleteCompany() {
-        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var sessionFactory = HibernateTestUtil.buildSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -181,7 +211,7 @@ class HibernateRunnerTest {
 
     @Test
     void deleteUser() {
-        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var sessionFactory = HibernateTestUtil.buildSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -193,7 +223,7 @@ class HibernateRunnerTest {
 
     @Test
     void addUserToCompany() {
-        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var sessionFactory = HibernateTestUtil.buildSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -213,7 +243,7 @@ class HibernateRunnerTest {
 
     @Test
     void oneToMany() {
-        @Cleanup var sessionFactory = HibernateUtil.buildSessionFactory();
+        @Cleanup var sessionFactory = HibernateTestUtil.buildSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
 
