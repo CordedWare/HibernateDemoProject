@@ -13,7 +13,10 @@ import java.time.Month;
 public class TestDataImporter {
 
     public void importData(SessionFactory sessionFactory) {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
+
         Company microsoft = saveCompany(session, "Microsoft");
         Company apple = saveCompany(session, "Apple");
         Company google = saveCompany(session, "Google");

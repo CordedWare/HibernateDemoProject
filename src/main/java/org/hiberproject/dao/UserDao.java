@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.hibernate.Session;
+import org.hiberproject.dto.PaymentFilter;
 import org.hiberproject.entity.Payment;
 import org.hiberproject.entity.User;
 
@@ -36,7 +37,7 @@ public class UserDao {
      * Возвращает всех сотрудников с указанным именем
      */
     public List<User> findAllByFirstName(Session session, String firstName) {
-//        return session.createQuery("select u from User u " +
+ //        return session.createQuery("select u from User u " +
 //                        "where u.personalInfo.firstname = :firstName", User.class)
 //                .setParameter("firstName", firstName)
 //                .list();
@@ -109,7 +110,7 @@ public class UserDao {
     /**
      * Возвращает среднюю зарплату сотрудника с указанными именем и фамилией
      */
-    public Double findAveragePaymentAmountByFirstAndLastNames(Session session, String firstName, String lastName) {
+    public Double findAveragePaymentAmountByFirstAndLastNames(Session session, PaymentFilter filter) {
 //        return session.createQuery("select avg(p.amount) from Payment p " +
 //                        "join p.receiver u " +
 //                        "where u.personalInfo.firstname = :firstName " +
@@ -118,12 +119,16 @@ public class UserDao {
 //                .setParameter("lastName", lastName)
 //                .uniqueResult();
 
+        var predicate = QPredicate.builder()
+                .add(filter.getFirstName(), user.personalInfo.firstname::eq)
+                .add(filter.getLastName(), user.personalInfo.lastname::eq)
+                .buildAnd();
+
         return new JPAQuery<Double>(session)
                 .select(payment.amount.avg())
                 .from(payment)
                 .join(payment.receiver, user)
-                .where(user.personalInfo.firstname.eq(firstName)
-                        .and(user.personalInfo.lastname.eq(lastName)))
+                .where(predicate)
                 .fetchOne();
     }
 

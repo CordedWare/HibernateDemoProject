@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import lombok.Cleanup;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hiberproject.dto.PaymentFilter;
 import org.hiberproject.entity.Payment;
 import org.hiberproject.entity.User;
 import org.hiberproject.util.HibernateTestUtil;
@@ -51,7 +52,9 @@ class UserDaoTest {
 
     @Test
     void findAllByFirstName() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<User> results = userDao.findAllByFirstName(session, "Bill");
@@ -64,7 +67,9 @@ class UserDaoTest {
 
     @Test
     void findLimitedUsersOrderedByBirthday() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         int limit = 3;
@@ -79,7 +84,9 @@ class UserDaoTest {
 
     @Test
     void findAllByCompanyName() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<User> results = userDao.findAllByCompanyName(session, "Google");
@@ -93,7 +100,9 @@ class UserDaoTest {
 
     @Test
     void findAllPaymentsByCompanyName() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<Payment> applePayments = userDao.findAllPaymentsByCompanyName(session, "Apple");
@@ -107,10 +116,17 @@ class UserDaoTest {
 
     @Test
     void findAveragePaymentAmountByFirstAndLastNames() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
-        Double averagePaymentAmount = userDao.findAveragePaymentAmountByFirstAndLastNames(session, "Bill", "Gates");
+        PaymentFilter filter = PaymentFilter.builder()
+                .lastName("Gates")
+                .firstName("Bill")
+                .build();
+
+        Double averagePaymentAmount = userDao.findAveragePaymentAmountByFirstAndLastNames(session, filter);
         assertThat(averagePaymentAmount).isEqualTo(300.0);
 
         session.getTransaction().commit();
@@ -118,7 +134,9 @@ class UserDaoTest {
 
     @Test
     void findCompanyNamesWithAvgUserPaymentsOrderedByCompanyName() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<Tuple> results = userDao.findCompanyNamesWithAvgUserPaymentsOrderedByCompanyName(session);
@@ -135,7 +153,9 @@ class UserDaoTest {
 
     @Test
     void isItPossible() {
-        @Cleanup Session session = sessionFactory.openSession();
+
+        @Cleanup
+        Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<Tuple> results = userDao.isItPossible(session);
